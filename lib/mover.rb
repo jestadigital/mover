@@ -110,7 +110,8 @@ module Mover
             FROM #{from[:table]}
             #{where}
           SQL
-        elsif !options[:generic] && connection.class.to_s.include?('Mysql')
+        # FIX JAW to allow Octopus proxy to mysql to also work.
+        elsif !options[:generic] && (connection.class.to_s.include?('Mysql') || connection.try(:config).try(:[], :adapter) =~ /mysql/)
           update = insert.collect do |column, value|
             if value.include?("'")
               "#{to[:table]}.#{column} = #{value}"
